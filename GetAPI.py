@@ -11,7 +11,7 @@ response = requests.request("GET", url, headers=headers, data=payload)
 print(response.text)
 
 with open("response.json", "w") as file:
-    json.dump(response, file, indent=4)
+    json.dump(json.loads(response), file, indent=4)
 
 print("JSON saved to 'data/response.json'")
 
