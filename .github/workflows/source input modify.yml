@@ -29,7 +29,7 @@ jobs:
             echo "modified_text=$MODIFIED_TEXT" >> $GITHUB_OUTPUT
           else
             echo "Condition not met: 'foo' not found in input."
-            MODIFIED_TEXT="${INPUT_TEXT//PROD/STG}"
+            MODIFIED_TEXT="${INPUT_TEXT//PROD/STAGE}"
             echo "Modified text: $MODIFIED_TEXT"
             echo "MODIFIED_TEXT=$MODIFIED_TEXT" >> $GITHUB_ENV
             echo "modified_text=$MODIFIED_TEXT" >> $GITHUB_OUTPUT
