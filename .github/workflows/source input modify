@@ -1,0 +1,25 @@
+name: Echo and Modify Input
+
+on:
+  workflow_dispatch:
+    inputs:
+      user_input:
+        description: 'Enter a string to modify'
+        required: true
+        default: 'hello world'
+
+jobs:
+  modify-and-echo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Modify and Echo Input
+        run: |
+          echo "Original input: $INPUT"
+          MODIFIED_INPUT=$(echo "$INPUT" | tr '[:lower:]' '[:upper:]')
+          echo "Modified input: $MODIFIED_INPUT"
+        env:
+          INPUT: ${{ github.event.inputs.user_input }}
