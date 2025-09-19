@@ -1,34 +1,42 @@
-name: Replace Text and Set as Env Var
+name: Conditional Replace and Set Env
 
 on:
   workflow_dispatch:
     inputs:
       input_text:
-        description: 'Input text where some words will be replaced'
+        description: 'Text input where replacement will happen if condition is met'
         required: true
         default: 'hello foo world'
 
 jobs:
-  replace-and-export:
+  conditional-replace:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Replace text and set as env var
-        id: modify_text
+      - name: Check for keyword and replace if found
+        id: check_and_replace
         run: |
-          echo "Original input: $INPUT_TEXT"
-          MODIFIED_TEXT="${INPUT_TEXT//PROD/STAGE}"
-          echo "Modified text: $MODIFIED_TEXT"
-          
-          # Export modified text as an output
-          echo "modified_text=$MODIFIED_TEXT" >> $GITHUB_OUTPUT
+          echo "Input: $INPUT_TEXT"
+
+          if [[ "$INPUT_TEXT" == *AA-BB-CC-PROD* ]]; then
+            echo "Condition met: 'foo' found in input."
+            MODIFIED_TEXT="${INPUT_TEXT//PROD/STG}"
+            echo "Modified text: $MODIFIED_TEXT"
+            echo "MODIFIED_TEXT=$MODIFIED_TEXT" >> $GITHUB_ENV
+            echo "modified_text=$MODIFIED_TEXT" >> $GITHUB_OUTPUT
+          else
+            echo "Condition not met: 'foo' not found in input."
+            MODIFIED_TEXT="${INPUT_TEXT//PROD/STAGE}"
+            echo "MODIFIED_TEXT=$INPUT_TEXT" >> $GITHUB_ENV
+            echo "modified_text=$INPUT_TEXT" >> $GITHUB_OUTPUT
+          fi
         env:
           INPUT_TEXT: ${{ github.event.inputs.input_text }}
 
-      - name: Use modified env var
+      - name: Use environment variable
         run: |
-          echo "Using modified env var:"
-          echo "MODIFIED_TEXT=${{ steps.modify_text.outputs.modified_text }}"
+          echo "Using the modified environment variable:"
+          echo "MODIFIED_TEXT=$MODIFIED_TEXT"
