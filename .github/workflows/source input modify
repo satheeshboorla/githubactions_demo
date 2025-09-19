@@ -1,25 +1,34 @@
-name: Echo and Modify Input
+name: Replace Text and Set as Env Var
 
 on:
   workflow_dispatch:
     inputs:
-      user_input:
-        description: 'Enter a string to modify'
+      input_text:
+        description: 'Input text where some words will be replaced'
         required: true
-        default: 'hello world'
+        default: 'hello foo world'
 
 jobs:
-  modify-and-echo:
+  replace-and-export:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Modify and Echo Input
+      - name: Replace text and set as env var
+        id: modify_text
         run: |
-          echo "Original input: $INPUT"
-          MODIFIED_INPUT=$(echo "$INPUT" | tr '[:lower:]' '[:upper:]')
-          echo "Modified input: $MODIFIED_INPUT"
+          echo "Original input: $INPUT_TEXT"
+          MODIFIED_TEXT="${INPUT_TEXT//PROD/STAGE}"
+          echo "Modified text: $MODIFIED_TEXT"
+          
+          # Export modified text as an output
+          echo "modified_text=$MODIFIED_TEXT" >> $GITHUB_OUTPUT
         env:
-          INPUT: ${{ github.event.inputs.user_input }}
+          INPUT_TEXT: ${{ github.event.inputs.input_text }}
+
+      - name: Use modified env var
+        run: |
+          echo "Using modified env var:"
+          echo "MODIFIED_TEXT=${{ steps.modify_text.outputs.modified_text }}"
